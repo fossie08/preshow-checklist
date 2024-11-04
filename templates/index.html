@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pre-Show Checklist | KES Tech Team</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <header>
+        <h1>KES Tech Team</h1>
+        <p>Pre-show Checklist</p>
+        <div id="countdown" class="countdown-timer"></div>
+    </header>
+    <main class="checklist-container">
+        {% for section in sections %}
+            <div class="section">
+                <h2>{{ section.name }}</h2>
+                <ul class="task-list">
+                    {% for task in tasks if task.section_id == section.doc_id %}
+                        <li>
+                            <span><strong>{{ task.dept }} - {{ task.person }}:</strong> {{ task.task }}</span>
+                            {% if task.done_by %}
+                                <span class="done">Done by {{ task.done_by }}</span>
+                            {% else %}
+                                <form method="POST" action="{{ url_for('mark_done', task_id=task.doc_id) }}">
+                                    <button type="submit" class="btn done-btn">Mark as Done</button>
+                                </form>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endfor %}
+    </main>
+</body>
+<script src="/static/script.js"></script>
+<script>
+    {% if countdown_enabled and countdown_time %}
+        // Initialize countdown timer using countdown_time from the server
+        const targetTime = new Date("{{ countdown_time }}").getTime();
+        startCountdown(targetTime);
+    {% endif %}
+</script>
+
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Pre-Show Checklist | KES Tech Team</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Admin Panel - KES Tech Team</h1>
+        <p>Manage Pre-show Checklist</p>
+    </header>
+
+    <main class="admin-container">
+        <section>
+            <h2>Countdown Settings</h2>
+            <form method="POST" action="{{ url_for('update_countdown') }}">
+                <label for="countdown_time">Countdown Time:</label>
+                <input type="datetime-local" name="countdown_time" value="{{ countdown_time }}" required>
+
+                <label for="countdown_enabled">Countdown Enabled:</label>
+                <input type="checkbox" name="countdown_enabled" {% if countdown_enabled %}checked{% endif %}>
+
+                <button type="submit" class="btn">Update Countdown</button>
+            </form>
+        </section>
+        <section>
+            <h2>Add New Section</h2>
+                <form method="POST" action="/admin/add_section">
+                    <label for="section_name">Section Name:</label>
+                    <input type="text" name="section_name" required>
+                    <button type="submit" class="btn add-btn">Add Section</button>
+                </form>
+        </section>
+        <section>
+            <h2>Add New Task</h2>
+            <form method="POST" action="{{ url_for('add_task') }}">
+                <label for="section">Section:</label>
+                <select name="section_id" required>
+                    {% for section in sections %}
+                        <option value="{{ section.doc_id }}">{{ section.name }}</option>
+                    {% endfor %}
+                </select>
+
+                <label for="dept">Department:</label>
+                <input type="text" name="dept" required>
+
+                <label for="person">Person:</label>
+                <input type="text" name="person" required>
+
+                <label for="task">Task Description:</label>
+                <input type="text" name="task" required>
+
+                <button type="submit" class="btn">Add Task</button>
+            </form>
+        </section>
+
+        {% for section in sections %}
+            <section>
+                <h2>{{ section.name }}</h2>
+                <ul class="task-list">
+                    {% for task in tasks if task.section_id == section.doc_id %}
+                        <li>
+                            <span><strong>{{ task.dept }} - {{ task.person }}:</strong> {{ task.task }}</span>
+                            {% if task.done_by %}
+                                <span class="done">Done by {{ task.done_by }}</span>
+                            {% else %}
+                                <span class="not-done">Not yet done</span>
+                            {% endif %}
+
+                            <form method="POST" action="{{ url_for('reset_task', task_id=task.doc_id) }}" style="display:inline;">
+                                <button type="submit" class="btn reset-btn">Reset Task</button>
+                            </form>
+                            <form method="POST" action="{{ url_for('delete_task', task_id=task.doc_id) }}" style="display:inline;">
+                                <button type="submit" class="btn delete-btn">Delete Task</button>
+                            </form>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+        {% endfor %}
+
+        <section>
+            <h2>Reset All Tasks</h2>
+            <form method="POST" action="{{ url_for('reset_all_tasks') }}">
+                <button type="submit" class="btn reset-all-btn">Reset All Tasks</button>
+            </form>
+        </section>
+    </main>
+</body>
+<script src="/static/script.js"></script>
+</html>
